@@ -61,12 +61,10 @@ describe('Blogs API source', function() {
         .then(function(_res) {
           res = _res;
           res.should.have.status(200);
-          console.log(res.body);
           res.body.should.have.length.of.at.least(1);
           return BlogPost.count();
         })
         .then(function(count) {
-          console.log(count);
           res.body.should.have.lengthOf(count);
         });
     });
@@ -95,6 +93,60 @@ describe('Blogs API source', function() {
           resBlogPost.title.should.equal(blogpost.title);
           resBlogPost.content.should.equal(blogpost.content);
           resBlogPost.author.should.equal(blogpost.authorName);
+        });
+    });
+  });
+
+  describe('POST endpoint', function() {
+    it('should add a new blog post', function() {
+
+      const newBlogPost = generateBlogData();
+      
+      return chai.request(app)
+        .post('/posts')
+        .send(newBlogPost)
+        .then(function(res) {
+          res.should.have.status(201);
+          res.should.be.json;
+          res.body.should.be.a('object');
+          res.body.should.include.keys(
+            'id', 'title', 'author', 'content', 'created'
+          );
+          res.body.title.should.equal(newBlogPost.title);
+          res.body.content.should.equal(newBlogPost.content);
+          res.body.author.should.equal(newBlogPost.author.firstName + ' ' + newBlogPost.author.lastName);
+          return BlogPost.findById(res.body.id);
+        })
+        .then(function(blogpost) {
+          blogpost.title.should.equal(newBlogPost.title);
+          blogpost.content.should.equal(newBlogPost.content);
+          blogpost.author.firstName.should.equal(newBlogPost.author.firstName);
+          blogpost.author.lastName.should.equal(newBlogPost.author.lastName);
+        });
+    });
+  });
+
+  describe('PUT endpoint', function() {
+    it('should update fields', function() {
+      const updateData = {
+        title: 'Cheezeburgerz: A History of Lolcats',
+      };
+
+      return BlogPost
+        .findOne()
+        .then(function(blogpost) {
+          updateData.id = blogpost.id;
+
+          return chai.request(app)
+            .put(`/posts/${blogpost.id}`)
+            .send(updateData);
+        })
+        .then(function(res) {
+          res.should.have.status(204);
+          return BlogPost.findById(updateData.id);
+        })
+        .then(function(blogpost) {
+          blogpost.title.should.equal(updateData.title);
         });
     });
   });
