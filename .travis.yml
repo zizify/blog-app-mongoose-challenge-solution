@@ -2,4 +2,9 @@ language: node_js
 node_js: node
 services:
 - mongodb
-deploy:app: andy-blog-mongoose
+deploy:
+  provider: heroku
+  api_key: 9f5f2f67-46ca-4b6b-bb7f-b3f66c4fb797
+  app: andy-blog-mongoose
+  on:
+    repo: zizify/blog-app-mongoose-challenge-solution
