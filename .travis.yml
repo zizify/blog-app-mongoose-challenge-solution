@@ -8,3 +8,4 @@ deploy:
   app: andy-blog-mongoose
   on:
     repo: zizify/blog-app-mongoose-challenge-solution
+    branch: tests
