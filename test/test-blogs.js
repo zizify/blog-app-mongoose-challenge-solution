@@ -150,4 +150,24 @@ describe('Blogs API source', function() {
         });
     });
   });
+
+  describe('DELETE endpoint', function() {
+    it('should delete a blog post by ID', function() {
+      let blogpost;
+
+      return BlogPost
+        .findOne()
+        .then(function(_blogpost) {
+          blogpost = _blogpost;
+          return chai.request(app).delete(`/posts/${blogpost.id}`);
+        })
+        .then(function(res) {
+          res.should.have.status(204);
+          return BlogPost.findById(blogpost.id);
+        })
+        .then(function(_blogpost) {
+          should.not.exist(_blogpost);
+        });
+    });
+  });
 });
